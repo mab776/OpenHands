@@ -51,6 +51,8 @@
 #                          Without this the automation backend may fall back to
 #                          S3/GCS which fails without cloud credentials.
 #   LOCAL_STORAGE_PATH     – Directory for local file storage (default: ~/.openhands/storage)
+#   CANVAS_BACKEND_URL     – (mab776) agent-server the browser's /api, /sockets, … routes
+#                          proxy to (default: the in-container http://127.0.0.1:AGENT_SERVER_PORT)
 #   AUTOMATION_BASE_URL    – Publicly-reachable base URL for the automation
 #                          service, used in callback URLs and injected into
 #                          sandboxes (default: http://127.0.0.1:$PORT).
@@ -397,6 +399,11 @@ RUNTIME_SERVICES_INFO="$(node /opt/agent-canvas/runtime-services-info.mjs \
   --agent-server-url "$AGENT_SERVER_URL" \
   --automation-url "$AUTOMATION_BASE_URL")"
 
+# mab776: CANVAS_BACKEND_URL points the browser-facing agent-server routes at an
+# EXTERNAL agent-server (e.g. one running natively on the host); the container is
+# then UI only. Unset = the in-container server, as upstream.
+CANVAS_BACKEND_URL="${CANVAS_BACKEND_URL:-http://127.0.0.1:${AGENT_SERVER_PORT}}"
+
 # EFFECTIVE_SESSION_KEY is set above from LOCAL_BACKEND_API_KEY or the persisted api-key.txt.
 # Binding every interface is required so Docker published ports can reach the
 # process: :: (dual-stack), or 0.0.0.0 on kernels without IPv6, where binding ::
@@ -424,15 +431,15 @@ node /opt/agent-canvas/static-server.mjs \
   --session-api-key "$EFFECTIVE_SESSION_KEY" \
   --runtime-services-info "$RUNTIME_SERVICES_INFO" \
   --route "/api/automation=http://127.0.0.1:${AUTOMATION_PORT}" \
-  --route "/api=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-  --route "/server_info=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-  --route "/sockets=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-  --route "/alive=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-  --route "/health=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-  --route "/ready=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-  --route "/docs=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-  --route "/redoc=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-  --route "/openapi.json=http://127.0.0.1:${AGENT_SERVER_PORT}" \
+  --route "/api=${CANVAS_BACKEND_URL}" \
+  --route "/server_info=${CANVAS_BACKEND_URL}" \
+  --route "/sockets=${CANVAS_BACKEND_URL}" \
+  --route "/alive=${CANVAS_BACKEND_URL}" \
+  --route "/health=${CANVAS_BACKEND_URL}" \
+  --route "/ready=${CANVAS_BACKEND_URL}" \
+  --route "/docs=${CANVAS_BACKEND_URL}" \
+  --route "/redoc=${CANVAS_BACKEND_URL}" \
+  --route "/openapi.json=${CANVAS_BACKEND_URL}" \
   --route "$VSCODE_ROUTE" \
   --vscode-base-path "$VSCODE_BASE_PATH" \
   --no-referrer-prefix "$VSCODE_BASE_PATH" &
@@ -476,15 +483,15 @@ if [ -n "${PUBLIC_MODE_PORT:-}" ]; then
     --auth-required \
     --runtime-services-info "$RUNTIME_SERVICES_INFO" \
     --route "/api/automation=http://127.0.0.1:${AUTOMATION_PORT}" \
-    --route "/api=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-    --route "/server_info=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-    --route "/sockets=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-    --route "/alive=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-    --route "/health=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-    --route "/ready=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-    --route "/docs=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-    --route "/redoc=http://127.0.0.1:${AGENT_SERVER_PORT}" \
-    --route "/openapi.json=http://127.0.0.1:${AGENT_SERVER_PORT}" &
+    --route "/api=${CANVAS_BACKEND_URL}" \
+    --route "/server_info=${CANVAS_BACKEND_URL}" \
+    --route "/sockets=${CANVAS_BACKEND_URL}" \
+    --route "/alive=${CANVAS_BACKEND_URL}" \
+    --route "/health=${CANVAS_BACKEND_URL}" \
+    --route "/ready=${CANVAS_BACKEND_URL}" \
+    --route "/docs=${CANVAS_BACKEND_URL}" \
+    --route "/redoc=${CANVAS_BACKEND_URL}" \
+    --route "/openapi.json=${CANVAS_BACKEND_URL}" &
   PIDS+=($!)
 fi
 
