@@ -91,6 +91,18 @@ const BackendFormModal = React.lazy(() =>
   })),
 );
 
+// mab776 add-ons, served from public/mab776/ (see public/mab776/README.md):
+// light + colour e-paper themes, the e-ink safety net, and the ASK/AUTO item in
+// the composer's "+" menu. Plain files on purpose: they are the same files the
+// stock image gets injected at container start, so either deployment works.
+const MAB776_BASE = `${import.meta.env.BASE_URL}mab776/`;
+const MAB776_STYLES = [
+  "heroui-palette.css",
+  "light-theme.css",
+  "eink-theme.css",
+];
+const MAB776_SCRIPTS = ["mode-toggle.js", "theme-toggle.js", "eink-guard.js"];
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -102,6 +114,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <script
           dangerouslySetInnerHTML={{ __html: COLOR_THEME_BOOTSTRAP_SCRIPT }}
         />
+        {MAB776_STYLES.map((file) => (
+          <link key={file} rel="stylesheet" href={MAB776_BASE + file} />
+        ))}
       </head>
       <body data-agent-server-ui="" className="m-0">
         <AgentServerUIRoot contentClassName="min-h-screen">
@@ -112,6 +127,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </AgentServerUIRoot>
         <ScrollRestoration />
         <Scripts />
+        {MAB776_SCRIPTS.map((file) => (
+          <script key={file} src={MAB776_BASE + file} />
+        ))}
       </body>
     </html>
   );
