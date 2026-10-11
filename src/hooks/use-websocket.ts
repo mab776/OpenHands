@@ -22,9 +22,13 @@ export interface WebSocketHookOptions {
   };
 }
 
-// Reconnect backoff bounds: 1s, 2s, 4s, … capped at 30s.
+// Reconnect backoff bounds: 1s, 2s, 4s, … capped at 5s.
+// mab776: upstream caps at 30s. A mobile webview freezes the page in the
+// background and kills the socket, and there is no visibilitychange/online
+// listener, so on resume the user could stare at "Unable to connect to server"
+// for up to 30s. 5s is plenty for a LAN backend.
 const RECONNECT_BASE_DELAY_MS = 1_000;
-const RECONNECT_MAX_DELAY_MS = 30_000;
+const RECONNECT_MAX_DELAY_MS = 5_000;
 
 export const useWebSocket = (url: string, options?: WebSocketHookOptions) => {
   const [isConnected, setIsConnected] = React.useState(false);
