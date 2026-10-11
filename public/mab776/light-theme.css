@@ -28,6 +28,10 @@ html.oh-light [data-agent-server-ui] {
   --oh-color-danger: #c0392b;
   --oh-color-success: #2f7d17;
   --oh-modal-title-foreground: #111;
+  /* 1.26.0 (2026-10-10): the "contrast" pair — #fff text/borders/washes (text-contrast, 324 uses) and
+     #000 text on a SOLID bg-contrast button (text-contrast-foreground). Inverted together. */
+  --oh-contrast: #111;
+  --oh-contrast-foreground: #fff;
 }
 /* the few hard-coded translucent whites used for hover/selection washes become blacks on light */
 html.oh-light [data-agent-server-ui] [class*="bg-white/"],
