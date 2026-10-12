@@ -1,7 +1,7 @@
 # mab776 fork of OpenHands (Agent Canvas)
 
-Branch **`mab776-1.26.0`** = upstream tag `v1.26.0` (the version the server runs,
-`ghcr.io/openhands/agent-canvas:1.26.0`) + these commits (previous: `mab776-1.20.0`):
+Branch **`mab776-1.27.1`** = upstream tag `v1.27.1` (the version the server runs,
+`ghcr.io/openhands/agent-canvas:1.27.1`) + these commits (earlier: `mab776-1.26.0`, `mab776-1.20.0`):
 
 | Commit | What |
 |---|---|
@@ -9,7 +9,7 @@ Branch **`mab776-1.26.0`** = upstream tag `v1.26.0` (the version the server runs
 | `websocket: 5 s reconnect cap` | `src/hooks/use-websocket.ts` caps the reconnect backoff at 5 s instead of 30 s (phone webview resume showed "Unable to connect to server" for up to 30 s). |
 | `UI add-ons` | `public/mab776/` (light + colour e-paper themes, e-ink guard, ASK/AUTO "+" menu item, Display row in Settings → Application) loaded from `src/root.tsx`. See `public/mab776/README.md`. |
 
-Companion fork: `mab776/OpenHands-software-agent-sdk`, branch `mab776-1.53.0` (the agent-server).
+Companion fork: `mab776/OpenHands-software-agent-sdk`, branch `mab776-1.54.0` (the agent-server).
 
 ## How the server uses this today
 
@@ -19,11 +19,11 @@ This branch is the source-level copy of those patches — keep both in step.
 
 To run this fork instead, build the image (`docker/Dockerfile`, frontend built with
 `VITE_BASE_PATH=/canvas`) and drop the three patch calls from the stack's entrypoint.
-Verified 2026-10-10: the built frontend + this entrypoint, run in a throwaway container
+Verified 2026-10-10 (on 1.20.0): the built frontend + this entrypoint, run in a throwaway container
 against the host agent, loaded the e-ink theme, guard, ASK/AUTO item and Display row,
 and proxied `/api` to `:7300`, with no console errors.
 
-## Notes for 1.26.0 (2026-10-10)
+## Notes since 1.26.0 (2026-10-10; still true on 1.27.1, 2026-10-12)
 
 - Set `AGENT_CANVAS_ALLOW_LAN_SESSION_KEY=true`: since 1.26 the session key is only embedded in the page on
   opt-in, otherwise every browser gets an "enter API key" screen (the server is LAN/WireGuard only).
@@ -31,7 +31,8 @@ and proxied `/api` to `:7300`, with no console errors.
   the e-ink layer (16 grey levels, ink colours, guard) is what makes the colour e-paper tablet usable.
   Keep upstream's theme on the default "OpenHands Neutral" when using ours.
 - New token pair `--oh-contrast` / `--oh-contrast-foreground` (white text + black-on-white buttons) is inverted
-  in `light-theme.css`; the e-ink audit was 0 unsafe / 0 guard fixes across 27 states after that.
+  in `light-theme.css`; the e-ink audit was 0 unsafe / 0 guard fixes across 27 states after that (and again on 1.27.1 with a real
+  Qwen conversation: context meter + expanded command output included).
 
 ## Updating to a new upstream version
 
